@@ -1,3 +1,8 @@
+/**
+ * @license
+ * Copyright 2025 Google LLC
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 import {
   CountTokensResponse,
@@ -27,7 +32,10 @@ function calculateCost(
   if (!modelCosts) {
     return 0;
   }
-  return inputTokens * modelCosts.input + outputTokens * modelCosts.output;
+  return (
+    (inputTokens / 1000) * modelCosts.input +
+    (outputTokens / 1000) * modelCosts.output
+  );
 }
 
 export class CostTrackingContentGenerator implements ContentGenerator {
@@ -91,3 +99,4 @@ export class CostTrackingContentGenerator implements ContentGenerator {
     }
   }
 }
+

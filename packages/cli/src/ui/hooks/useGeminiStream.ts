@@ -91,8 +91,6 @@ export const useGeminiStream = (
   getPreferredEditor: () => EditorType | undefined,
   onAuthError: () => void,
   performMemoryRefresh: () => Promise<void>,
-  modelSwitchedFromQuotaError: boolean,
-  setModelSwitchedFromQuotaError: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
   const [initError, setInitError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -110,8 +108,6 @@ export const useGeminiStream = (
     }
     return new GitService(config.getProjectRoot());
   }, [config]);
-
-  
 
   const [toolCalls, scheduleToolCalls, markToolsAsSubmitted] =
     useReactToolScheduler(
@@ -786,9 +782,9 @@ export const useGeminiStream = (
         return;
       }
       if (geminiClient) {
-          
+        // TODO: Checkpoint the stream.
       }
-   
+
       const restorableToolCalls = toolCalls.filter(
         (toolCall) =>
           (toolCall.request.name === 'replace' ||
