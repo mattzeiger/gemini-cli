@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { costState } from '../state/costState.js';
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import {
   Box,
@@ -167,14 +168,18 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     [consoleMessages],
   );
 
-  const [totalCost, setTotalCost] = useState<number>(0);
+  const [totalCost, setTotalCost] = useState(costState.getTotalCost());
 
-  const handleCostUpdate = useCallback((cost: number) => {
-    setTotalCost((prev) => prev + cost);
+  useEffect(() => {
+    const handleCostChange = (newCost: number) => {
+      setTotalCost(newCost);
+    };
+    costState.on('change', handleCostChange);
+    return () => {
+      costState.off('change', handleCostChange);
+    };
   }, []);
 
-  
-  
   const {
     isThemeDialogOpen,
     openThemeDialog,
@@ -256,13 +261,20 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
       addItem(
         {
           type: MessageType.INFO,
-          text: `Memory refreshed successfully. ${memoryContent.length > 0 ? `Loaded ${memoryContent.length} characters from ${fileCount} file(s).` : 'No memory content found.'}`,
+          text: `Memory refreshed successfully. ${
+            memoryContent.length > 0
+              ? `Loaded ${memoryContent.length} characters from ${fileCount} file(s).`
+              : 'No memory content found.'
+          }`,
         },
         Date.now(),
       );
       if (config.getDebugMode()) {
         console.log(
-          `[DEBUG] Refreshed memory content in config: ${memoryContent.substring(0, 200)}...`,
+          `[DEBUG] Refreshed memory content in config: ${memoryContent.substring(
+            0,
+            200,
+          )}...`,
         );
       }
     } catch (error) {
