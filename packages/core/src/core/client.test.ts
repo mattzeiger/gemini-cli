@@ -207,7 +207,10 @@ describe('Gemini Client (client.ts)', () => {
     // and the constructor will use the mocked GoogleGenAI
     const mockConfig = new Config({} as never);
     client = new GeminiClient(mockConfig);
-    await client.initialize(contentGeneratorConfig);
+    await client.initialize(
+      contentGeneratorConfig,
+      () => {}, // onCostUpdate
+    );
   });
 
   afterEach(() => {

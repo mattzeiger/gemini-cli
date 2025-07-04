@@ -111,6 +111,8 @@ export const useGeminiStream = (
     return new GitService(config.getProjectRoot());
   }, [config]);
 
+  
+
   const [toolCalls, scheduleToolCalls, markToolsAsSubmitted] =
     useReactToolScheduler(
       async (completedToolCallsFromScheduler) => {
@@ -783,6 +785,10 @@ export const useGeminiStream = (
       if (!config.getCheckpointingEnabled()) {
         return;
       }
+      if (geminiClient) {
+          
+      }
+   
       const restorableToolCalls = toolCalls.filter(
         (toolCall) =>
           (toolCall.request.name === 'replace' ||

@@ -235,6 +235,7 @@ export async function loadCliConfig(
   extensions: Extension[],
   sessionId: string,
   argv: CliArgs,
+  onCostUpdate: (cost: number) => void,
 ): Promise<Config> {
   const debugMode =
     argv.debug ||
@@ -404,6 +405,7 @@ export async function loadCliConfig(
     noBrowser: !!process.env.NO_BROWSER,
     summarizeToolOutput: settings.summarizeToolOutput,
     ideMode,
+    onCostUpdate,
   });
 }
 

@@ -150,6 +150,7 @@ export interface ConfigParameters {
   noBrowser?: boolean;
   summarizeToolOutput?: Record<string, SummarizeToolOutputSettings>;
   ideMode?: boolean;
+  onCostUpdate?: (cost: number) => void;
 }
 
 export class Config {
@@ -194,6 +195,7 @@ export class Config {
   private readonly maxSessionTurns: number;
   private readonly listExtensions: boolean;
   private readonly _activeExtensions: ActiveExtension[];
+  private readonly onCostUpdate: (cost: number) => void;
   flashFallbackHandler?: FlashFallbackHandler;
   private quotaErrorOccurred: boolean = false;
   private readonly summarizeToolOutput:
@@ -227,6 +229,7 @@ export class Config {
       logPrompts: params.telemetry?.logPrompts ?? true,
     };
     this.usageStatisticsEnabled = params.usageStatisticsEnabled ?? true;
+    this.onCostUpdate = params.onCostUpdate ?? (() => {});
 
     this.fileFiltering = {
       respectGitIgnore: params.fileFiltering?.respectGitIgnore ?? true,
@@ -280,7 +283,10 @@ export class Config {
     );
 
     this.geminiClient = new GeminiClient(this);
-    await this.geminiClient.initialize(this.contentGeneratorConfig);
+    await this.geminiClient.initialize(
+      this.contentGeneratorConfig,
+      this.onCostUpdate,
+    );
 
     // Reset the session flag since we're explicitly changing auth and using default model
     this.modelSwitchedDuringSession = false;

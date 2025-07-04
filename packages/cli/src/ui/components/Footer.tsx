@@ -31,6 +31,7 @@ interface FooterProps {
   showMemoryUsage?: boolean;
   promptTokenCount: number;
   nightly: boolean;
+  totalCost: number;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -45,6 +46,7 @@ export const Footer: React.FC<FooterProps> = ({
   showMemoryUsage,
   promptTokenCount,
   nightly,
+  totalCost,
 }) => {
   const limit = tokenLimit(model);
   const percentage = promptTokenCount / limit;
@@ -134,6 +136,8 @@ export const Footer: React.FC<FooterProps> = ({
           <Text color={Colors.Gray}>
             ({((1 - percentage) * 100).toFixed(0)}% context left)
           </Text>
+          <Text color={Colors.Gray}> | </Text>
+          <Text color={Colors.AccentGreen}>${totalCost.toFixed(4)}</Text>
         </Text>
         {corgiMode && (
           <Text>

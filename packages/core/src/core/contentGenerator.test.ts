@@ -31,6 +31,7 @@ describe('createContentGenerator', () => {
         authType: AuthType.LOGIN_WITH_GOOGLE,
       },
       mockConfig,
+      () => {},
     );
     expect(createCodeAssistContentGenerator).toHaveBeenCalled();
     expect(generator).toBe(mockGenerator);
@@ -48,6 +49,7 @@ describe('createContentGenerator', () => {
         authType: AuthType.USE_GEMINI,
       },
       mockConfig,
+      () => {},
     );
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
