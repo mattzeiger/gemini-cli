@@ -167,6 +167,14 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     [consoleMessages],
   );
 
+  const [totalCost, setTotalCost] = useState<number>(0);
+
+  const handleCostUpdate = useCallback((cost: number) => {
+    setTotalCost((prev) => prev + cost);
+  }, []);
+
+  
+  
   const {
     isThemeDialogOpen,
     openThemeDialog,
@@ -979,6 +987,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
             }
             promptTokenCount={sessionStats.lastPromptTokenCount}
             nightly={nightly}
+            totalCost={totalCost}
           />
         </Box>
       </Box>

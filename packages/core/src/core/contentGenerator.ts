@@ -104,9 +104,12 @@ export function createContentGeneratorConfig(
   return contentGeneratorConfig;
 }
 
+import { CostTrackingContentGenerator } from './costTrackingContentGenerator.js';
+
 export async function createContentGenerator(
   config: ContentGeneratorConfig,
   gcConfig: Config,
+  onCostUpdate: (cost: number) => void,
   sessionId?: string,
 ): Promise<ContentGenerator> {
   const version = process.env.CLI_VERSION || process.version;
@@ -119,11 +122,16 @@ export async function createContentGenerator(
     config.authType === AuthType.LOGIN_WITH_GOOGLE ||
     config.authType === AuthType.CLOUD_SHELL
   ) {
-    return createCodeAssistContentGenerator(
+    const generator = await createCodeAssistContentGenerator(
       httpOptions,
       config.authType,
       gcConfig,
       sessionId,
+    );
+    return new CostTrackingContentGenerator(
+      generator,
+      config.model,
+      onCostUpdate,
     );
   }
 
@@ -137,7 +145,11 @@ export async function createContentGenerator(
       httpOptions,
     });
 
-    return googleGenAI.models;
+    return new CostTrackingContentGenerator(
+      googleGenAI.models,
+      config.model,
+      onCostUpdate,
+    );
   }
 
   throw new Error(

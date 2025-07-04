@@ -105,6 +105,8 @@ export class GeminiClient {
   private readonly loopDetector: LoopDetectionService;
   private lastPromptId?: string;
 
+  private onCostUpdate: (cost: number) => void = () => {};
+
   constructor(private config: Config) {
     if (config.getProxy()) {
       setGlobalDispatcher(new ProxyAgent(config.getProxy() as string));
@@ -114,10 +116,15 @@ export class GeminiClient {
     this.loopDetector = new LoopDetectionService(config);
   }
 
-  async initialize(contentGeneratorConfig: ContentGeneratorConfig) {
+  async initialize(
+    contentGeneratorConfig: ContentGeneratorConfig,
+    onCostUpdate: (cost: number) => void,
+  ) {
+    this.onCostUpdate = onCostUpdate;
     this.contentGenerator = await createContentGenerator(
       contentGeneratorConfig,
       this.config,
+      this.onCostUpdate,
       this.config.getSessionId(),
     );
     this.chat = await this.startChat();

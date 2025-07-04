@@ -109,6 +109,7 @@ export async function main() {
     extensions,
     sessionId,
     argv,
+    () => {}, // No-op for non-interactive config
   );
 
   if (argv.promptInteractive && !process.stdin.isTTY) {
@@ -116,6 +117,16 @@ export async function main() {
       'Error: The --prompt-interactive flag is not supported when piping input from stdin.',
     );
     process.exit(1);
+  }
+
+  // Set default fallback to gemini api key
+  // This has to go after load cli because that's where the env is set
+  if (!settings.merged.selectedAuthType && process.env.GEMINI_API_KEY) {
+    settings.setValue(
+      SettingScope.User,
+      'selectedAuthType',
+      AuthType.USE_GEMINI,
+    );
   }
 
   if (config.getListExtensions()) {
@@ -134,6 +145,20 @@ export async function main() {
         'selectedAuthType',
         AuthType.CLOUD_SHELL,
       );
+    }
+  }
+
+  // If an auth type is selected, initialize the client now.
+  if (settings.merged.selectedAuthType) {
+    try {
+      const err = validateAuthMethod(settings.merged.selectedAuthType);
+      if (err) {
+        // Let the UI handle showing the auth dialog by not throwing here.
+      } else {
+        await config.refreshAuth(settings.merged.selectedAuthType);
+      }
+    } catch {
+      // Let the UI handle the error.
     }
   }
 
@@ -308,6 +333,7 @@ async function loadNonInteractiveConfig(
       extensions,
       config.getSessionId(),
       argv,
+      () => {}, // onCostUpdate
     );
     await finalConfig.initialize();
   }
