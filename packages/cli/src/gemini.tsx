@@ -85,6 +85,8 @@ async function relaunchWithAdditionalArgs(additionalArgs: string[]) {
   process.exit(0);
 }
 
+import { costState } from './state/costState.js';
+
 export async function main() {
   const workspaceRoot = process.cwd();
   const settings = loadSettings(workspaceRoot);
@@ -109,7 +111,7 @@ export async function main() {
     extensions,
     sessionId,
     argv,
-    () => {}, // No-op for non-interactive config
+    (cost: number) => costState.updateCost(cost),
   );
 
   if (argv.promptInteractive && !process.stdin.isTTY) {

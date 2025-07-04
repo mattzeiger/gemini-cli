@@ -25,16 +25,16 @@ describe('createContentGenerator', () => {
     vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
       mockGenerator as never,
     );
-    const generator = await createContentGenerator(
+    const generator = (await createContentGenerator(
       {
         model: 'test-model',
         authType: AuthType.LOGIN_WITH_GOOGLE,
       },
       mockConfig,
       () => {},
-    );
+    )) as any;
     expect(createCodeAssistContentGenerator).toHaveBeenCalled();
-    expect(generator).toBe(mockGenerator);
+    expect(generator.wrapped).toBe(mockGenerator);
   });
 
   it('should create a GoogleGenAI content generator', async () => {
@@ -42,7 +42,7 @@ describe('createContentGenerator', () => {
       models: {},
     } as unknown;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    const generator = await createContentGenerator(
+    const generator = (await createContentGenerator(
       {
         model: 'test-model',
         apiKey: 'test-api-key',
@@ -50,7 +50,7 @@ describe('createContentGenerator', () => {
       },
       mockConfig,
       () => {},
-    );
+    )) as any;
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
       vertexai: undefined,
@@ -60,7 +60,7 @@ describe('createContentGenerator', () => {
         },
       },
     });
-    expect(generator).toBe((mockGenerator as GoogleGenAI).models);
+    expect(generator.wrapped).toBe((mockGenerator as GoogleGenAI).models);
   });
 });
 
