@@ -538,8 +538,6 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     getPreferredEditor,
     onAuthError,
     performMemoryRefresh,
-    modelSwitchedFromQuotaError,
-    setModelSwitchedFromQuotaError,
   );
   pendingHistoryItems.push(...pendingGeminiHistoryItems);
   const { elapsedTime, currentLoadingPhrase } =
