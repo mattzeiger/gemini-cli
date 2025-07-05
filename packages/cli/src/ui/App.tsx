@@ -452,8 +452,24 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
         if (timerRef.current) {
           clearTimeout(timerRef.current);
         }
-        // Directly invoke the central command handler.
-        handleSlashCommand('/quit');
+        const quitCommand = slashCommands.find(
+          (cmd) => cmd.name === 'quit' || cmd.altName === 'exit',
+        );
+        if (quitCommand) {
+          const cost = costState.getTotalCost();
+          if (cost > 0) {
+            addItem(
+              {
+                type: MessageType.INFO,
+                text: `Total cost for this session: ${cost.toFixed(4)}`,
+              },
+              Date.now(),
+            );
+          }
+          quitCommand.action('quit', '', '');
+        } else {
+          process.exit(0);
+        }
       } else {
         setPressedOnce(true);
         timerRef.current = setTimeout(() => {

@@ -74,7 +74,11 @@ function getNodeMemoryArgs(config: Config): string[] {
 
 async function relaunchWithAdditionalArgs(additionalArgs: string[]) {
   const nodeArgs = [...additionalArgs, ...process.argv.slice(1)];
-  const newEnv = { ...process.env, GEMINI_CLI_NO_RELAUNCH: 'true' };
+  const newEnv = {
+    ...process.env,
+    GEMINI_CLI_NO_RELAUNCH: 'true',
+    GEMINI_CLI_SESSION_COST: costState.getTotalCost().toString(),
+  };
 
   const child = spawn(process.execPath, nodeArgs, {
     stdio: 'inherit',
