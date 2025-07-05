@@ -609,6 +609,14 @@ export async function start_sandbox(
   // set SANDBOX as container name
   args.push('--env', `SANDBOX=${containerName}`);
 
+  // set GEMINI_CLI_SESSION_COST
+  if (process.env.GEMINI_CLI_SESSION_COST) {
+    args.push(
+      '--env',
+      `GEMINI_CLI_SESSION_COST=${process.env.GEMINI_CLI_SESSION_COST}`,
+    );
+  }
+
   // for podman only, use empty --authfile to skip unnecessary auth refresh overhead
   if (config.command === 'podman') {
     const emptyAuthFilePath = path.join(os.tmpdir(), 'empty_auth.json');
