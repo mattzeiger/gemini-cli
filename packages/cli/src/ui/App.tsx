@@ -461,16 +461,6 @@ const App = ({
           (cmd) => cmd.name === 'quit' || cmd.altName === 'exit',
         );
         if (quitCommand) {
-          const cost = costState.getTotalCost();
-          if (cost > 0) {
-            addItem(
-              {
-                type: MessageType.INFO,
-                text: `Total cost for this session: ${cost.toFixed(4)}`,
-              },
-              Date.now(),
-            );
-          }
           quitCommand.action('quit', '', '');
         } else {
           process.exit(0);
