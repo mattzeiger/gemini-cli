@@ -142,11 +142,13 @@ const ModelUsageTable: React.FC<{
 interface StatsDisplayProps {
   duration: string;
   title?: string;
+  cost?: number;
 }
 
 export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   duration,
   title,
+  cost,
 }) => {
   const { stats } = useSessionStats();
   const { metrics } = stats;
@@ -253,6 +255,14 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
           totalCachedTokens={computed.totalCachedTokens}
           cacheEfficiency={computed.cacheEfficiency}
         />
+      )}
+
+      {cost !== undefined && (
+        <Box marginTop={1}>
+          <StatRow title="Estimated Cost:">
+            <Text color={Colors.AccentGreen}>${cost.toFixed(4)}</Text>
+          </StatRow>
+        </Box>
       )}
     </Box>
   );
