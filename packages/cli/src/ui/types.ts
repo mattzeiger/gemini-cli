@@ -113,6 +113,7 @@ export type HistoryItemToolStats = HistoryItemBase & {
 export type HistoryItemQuit = HistoryItemBase & {
   type: 'quit';
   duration: string;
+  cost: number;
 };
 
 export type HistoryItemToolGroup = HistoryItemBase & {

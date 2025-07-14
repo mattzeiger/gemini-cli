@@ -260,6 +260,7 @@ export class GeminiClient {
       return new GeminiChat(
         this.config,
         this.getContentGenerator(),
+        this.onCostUpdate,
         {
           systemInstruction,
           ...generateContentConfigWithThinking,

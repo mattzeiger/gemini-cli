@@ -35,6 +35,7 @@ import {
   ApiResponseEvent,
 } from '../telemetry/types.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
+import { calculateCost } from './costUtils.js';
 
 /**
  * Returns true if the response is valid, false otherwise.
@@ -134,6 +135,7 @@ export class GeminiChat {
   constructor(
     private readonly config: Config,
     private readonly contentGenerator: ContentGenerator,
+    private readonly onCostUpdate: (cost: number) => void,
     private readonly generationConfig: GenerateContentConfig = {},
     private history: Content[] = [],
   ) {
@@ -550,12 +552,20 @@ export class GeminiChat {
         }
       }
       const fullText = getStructuredResponseFromParts(allParts);
+      const finalUsage = this.getFinalUsageMetadata(chunks);
       await this._logApiResponse(
         durationMs,
         prompt_id,
         this.getFinalUsageMetadata(chunks),
         fullText,
       );
+      const finalUsage = this.getFinalUsageMetadata(chunks);
+      if (finalUsage) {
+        const cost = calculateCost(this.config.getModel(), finalUsage);
+        if (cost > 0) {
+          this.onCostUpdate(cost);
+        }
+      }
     }
     this.recordHistory(inputContent, outputContent);
   }
