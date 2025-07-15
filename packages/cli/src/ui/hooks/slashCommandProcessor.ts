@@ -11,6 +11,7 @@ import { UseHistoryManagerReturn } from './useHistoryManager.js';
 import { useStateAndRef } from './useStateAndRef.js';
 import { Config, GitService, Logger } from '@google/gemini-cli-core';
 import { useSessionStats } from '../contexts/SessionContext.js';
+import { costState } from '../../state/costState.js';
 import {
   Message,
   MessageType,
@@ -123,6 +124,7 @@ export const useSlashCommandProcessor = (
         historyItemContent = {
           type: 'quit',
           duration: message.duration,
+          cost: 0,
         };
       } else if (message.type === MessageType.COMPRESSION) {
         historyItemContent = {

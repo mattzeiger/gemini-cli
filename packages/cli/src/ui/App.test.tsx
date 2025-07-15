@@ -269,6 +269,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -286,6 +287,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -306,6 +308,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -329,6 +332,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -349,6 +353,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -369,6 +374,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -389,6 +395,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -410,6 +417,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -423,6 +431,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -442,6 +451,7 @@ describe('App UI', () => {
       <App
         config={mockConfig as unknown as ServerConfig}
         settings={mockSettings}
+<<<<<<< HEAD
         version={mockVersion}
       />,
     );
@@ -523,7 +533,11 @@ describe('App UI', () => {
         <App
           config={mockConfig as unknown as ServerConfig}
           settings={mockSettings}
+<<<<<<< HEAD
           version={mockVersion}
+=======
+          version="test"
+>>>>>>> 238ce2c2 (WIP cost tracking changes)
         />,
       );
       currentUnmount = unmount;
@@ -538,7 +552,11 @@ describe('App UI', () => {
         <App
           config={mockConfig as unknown as ServerConfig}
           settings={mockSettings}
+<<<<<<< HEAD
           version={mockVersion}
+=======
+          version="test"
+>>>>>>> 238ce2c2 (WIP cost tracking changes)
         />,
       );
       currentUnmount = unmount;

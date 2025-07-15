@@ -101,6 +101,7 @@ describe('<HistoryItemDisplay />', () => {
       ...baseItem,
       type: 'quit',
       duration: '1s',
+      cost: 0,
     };
     const { lastFrame } = render(
       <SessionStatsProvider>

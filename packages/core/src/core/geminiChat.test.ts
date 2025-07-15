@@ -250,10 +250,13 @@ describe('GeminiChat', () => {
         role: 'model',
         parts: [{ text: 'Initial model answer.' }],
       };
-      chat = new GeminiChat(mockConfig, mockModelsModule, config, [
-        initialUser,
-        initialModel,
-      ]);
+      chat = new GeminiChat(
+        mockConfig,
+        mockModelsModule,
+        vi.fn(),
+        config,
+        [initialUser, initialModel],
+      );
 
       // New interaction
       const currentUserInput: Content = {

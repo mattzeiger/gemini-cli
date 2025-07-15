@@ -6,7 +6,7 @@
 
 import { GenerateContentResponseUsageMetadata } from '@google/genai';
 
-const MODEL_COSTS = {
+export const MODEL_COSTS = {
   'gemini-1.5-pro': {
     input: 7 / 1000000,
     output: 21 / 1000000,
@@ -17,11 +17,17 @@ const MODEL_COSTS = {
     output: 2.1 / 1000000,
     cached: 0.35 / 1000000,
   },
-  // TODO(mattz): get official pricing for 2.5
   'gemini-2.5-pro': {
-    input: 1.25 / 1000000,
-    output: 10.0 / 1000000,
-    cached: 0.31 / 1000000, // placeholder
+    small_prompt: {
+      input: 1.25 / 1000000,
+      output: 10.0 / 1000000,
+      cached: 0.31 / 1000000,
+    },
+    large_prompt: {
+      input: 2.5 / 1000000,
+      output: 15.0 / 1000000,
+      cached: 0.625 / 1000000,
+    },
   },
 };
 
@@ -29,8 +35,8 @@ export function calculateCost(
   model: string,
   usageMetadata: GenerateContentResponseUsageMetadata,
 ): number {
-  const modelCosts = MODEL_COSTS[model as keyof typeof MODEL_COSTS];
-  if (!modelCosts) {
+  const modelCostInfo = MODEL_COSTS[model as keyof typeof MODEL_COSTS];
+  if (!modelCostInfo) {
     return 0;
   }
 
@@ -40,15 +46,40 @@ export function calculateCost(
   const cachedTokens = usageMetadata.cachedContentTokenCount || 0;
   const totalTokens = usageMetadata.totalTokenCount || 0;
 
+  let modelCosts;
+  if (model === 'gemini-2.5-pro') {
+    const tiers = modelCostInfo as {
+      small_prompt: { input: number; output: number; cached: number };
+      large_prompt: { input: number; output: number; cached: number };
+    };
+    modelCosts =
+      promptTokens > 200000 ? tiers.large_prompt : tiers.small_prompt;
+  } else {
+    modelCosts = modelCostInfo as {
+      input: number;
+      output: number;
+      cached: number;
+    };
+  }
+
+  if (!modelCosts) {
+    return 0;
+  }
+
+  // The most reliable way to calculate output tokens is to take the total
+  // and subtract the known input-side tokens.
   const outputTokens = totalTokens - promptTokens - cachedTokens;
 
+  // As a fallback, if for some reason totalTokenCount is not provided,
+  // sum up the known output-side tokens.
   const fallbackOutputTokens = candidateTokens + thinkingTokens;
 
-  const finalOutputTokens = outputTokens > 0 ? outputTokens : fallbackOutputTokens;
+  const finalOutputTokens =
+    outputTokens > 0 ? outputTokens : fallbackOutputTokens;
 
-  const inputCost = (promptTokens / 1000000) * modelCosts.input;
-  const outputCost = (finalOutputTokens / 1000000) * modelCosts.output;
-  const cachedCost = (cachedTokens / 1000000) * modelCosts.cached;
+  const inputCost = (promptTokens - cachedTokens) * modelCosts.input;
+  const outputCost = finalOutputTokens * modelCosts.output;
+  const cachedCost = cachedTokens * modelCosts.cached;
 
   return inputCost + outputCost + cachedCost;
 }

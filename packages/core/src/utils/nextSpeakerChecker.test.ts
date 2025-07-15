@@ -72,7 +72,7 @@ describe('checkNextSpeaker', () => {
     chatInstance = new GeminiChat(
       mockConfigInstance,
       mockModelsInstance, // This is the instance returned by mockGoogleGenAIInstance.getGenerativeModel
-      {},
+      vi.fn(),
       [], // initial history
     );
 
