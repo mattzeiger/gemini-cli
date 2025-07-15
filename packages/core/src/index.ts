@@ -11,6 +11,7 @@ export * from './config/config.js';
 export * from './core/client.js';
 export * from './core/contentGenerator.js';
 export * from './core/geminiChat.js';
+export * from './core/costUtils.js';
 export * from './core/logger.js';
 export * from './core/prompts.js';
 export * from './core/tokenLimits.js';

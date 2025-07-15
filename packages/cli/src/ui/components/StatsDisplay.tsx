@@ -17,7 +17,9 @@ import {
   USER_AGREEMENT_RATE_HIGH,
   USER_AGREEMENT_RATE_MEDIUM,
 } from '../utils/displayUtils.js';
+import { CostBreakdownTable } from './CostBreakdownTable.js';
 import { computeSessionStats } from '../utils/computeStats.js';
+import { MODEL_COSTS } from '@google/gemini-cli-core';
 
 // A more flexible and powerful StatRow component
 interface StatRowProps {
@@ -188,6 +190,68 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
     );
   };
 
+  const modelName = Object.keys(models)[0];
+  const metricsForModel = models[modelName];
+  let costBreakdown = null;
+   
+  if (cost !== undefined && metricsForModel) {
+    const promptTokens = metricsForModel.tokens.prompt;
+    const cachedTokens = metricsForModel.tokens.cached;
+    const outputTokens =
+      metricsForModel.tokens.candidates + metricsForModel.tokens.thoughts;
+    const billedInput = promptTokens - cachedTokens;
+   
+    const modelCostInfo = MODEL_COSTS[modelName as keyof typeof MODEL_COSTS];
+   
+    if (modelCostInfo) {
+      let pricing;
+      if (modelName === 'gemini-2.5-pro') {
+        const tiers = modelCostInfo as {
+          small_prompt: any;
+          large_prompt: any;
+        };
+        pricing =
+          promptTokens > 200000 ? tiers.large_prompt : tiers.small_prompt;
+      } else {
+        pricing = modelCostInfo;
+      }
+   
+      const billedInputCost = billedInput * pricing.input;
+      const outputCost = outputTokens * pricing.output;
+      const cachedCost = cachedTokens * pricing.cached;
+   
+      costBreakdown = (
+        <Box flexDirection="column">
+          <CostBreakdownTable
+            billedInput={billedInput}
+            outputTokens={outputTokens}
+            cachedTokens={cachedTokens}
+            billedInputCost={billedInputCost}
+            outputCost={outputCost}
+            cachedCost={cachedCost}
+            totalCost={cost}
+            pricing={pricing}
+          />
+          <Box marginTop={1}>
+            <Text color={Colors.Gray}>
+              Cached context storage cost is not included. With{' '}
+              {computed.totalCachedTokens.toLocaleString()} cached tokens and an
+              agent active time of {formatDuration(computed.agentActiveTime)},
+              the estimated maximum storage cost is $
+              {(                          
+                (computed.totalCachedTokens / 1000000) *
+                (computed.agentActiveTime / (1000 * 60 * 60)) *
+                4.5                    
+              ).toFixed(4)}               
+              .                           
+            </Text>                       
+          </Box>                          
+        </Box>                            
+      );                                  
+    }                                     
+  }                                       
+   
+
   return (
     <Box
       borderStyle="round"
@@ -257,13 +321,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         />
       )}
 
-      {cost !== undefined && (
-        <Box marginTop={1}>
-          <StatRow title="Estimated Cost:">
-            <Text color={Colors.AccentGreen}>${cost.toFixed(4)}</Text>
-          </StatRow>
-        </Box>
-      )}
+      {costBreakdown}
     </Box>
   );
 };
