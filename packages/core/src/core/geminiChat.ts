@@ -35,7 +35,7 @@ import {
   ApiResponseEvent,
 } from '../telemetry/types.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
-import { calculateCost } from './costUtils.js';
+import { calculateCostBreakdown } from './costUtils.js';
 
 /**
  * Returns true if the response is valid, false otherwise.
@@ -322,6 +322,22 @@ export class GeminiChat {
         getStructuredResponse(response),
       );
 
+      if (response.usageMetadata) {
+        const costBreakdown = calculateCostBreakdown(this.config.getModel(), {
+          promptTokenCount: response.usageMetadata.promptTokenCount || 0,
+          candidatesTokenCount:
+            response.usageMetadata.candidatesTokenCount || 0,
+          thinkingTokensCount: response.usageMetadata.thinkingTokensCount || 0,
+          cachedContentTokenCount:
+            response.usageMetadata.cachedContentTokenCount || 0,
+          totalTokenCount: response.usageMetadata.totalTokenCount || 0,
+        });
+
+        if (costBreakdown && costBreakdown.totalCost > 0) {
+          this.onCostUpdate(costBreakdown.totalCost);
+        }
+      }
+
       this.sendPromise = (async () => {
         const outputContent = response.candidates?.[0]?.content;
         // Because the AFC input contains the entire curated chat history in
@@ -552,7 +568,6 @@ export class GeminiChat {
         }
       }
       const fullText = getStructuredResponseFromParts(allParts);
-      const finalUsage = this.getFinalUsageMetadata(chunks);
       await this._logApiResponse(
         durationMs,
         prompt_id,
@@ -561,9 +576,16 @@ export class GeminiChat {
       );
       const finalUsage = this.getFinalUsageMetadata(chunks);
       if (finalUsage) {
-        const cost = calculateCost(this.config.getModel(), finalUsage);
-        if (cost > 0) {
-          this.onCostUpdate(cost);
+        const costBreakdown = calculateCostBreakdown(this.config.getModel(), {
+          promptTokenCount: finalUsage.promptTokenCount || 0,
+          candidatesTokenCount: finalUsage.candidatesTokenCount || 0,
+          thinkingTokensCount: finalUsage.thinkingTokensCount || 0,
+          cachedContentTokenCount: finalUsage.cachedContentTokenCount || 0,
+          totalTokenCount: finalUsage.totalTokenCount || 0,
+        });
+
+        if (costBreakdown && costBreakdown.totalCost > 0) {
+          this.onCostUpdate(costBreakdown.totalCost);
         }
       }
     }

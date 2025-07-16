@@ -19,7 +19,7 @@ import {
 } from '../utils/displayUtils.js';
 import { CostBreakdownTable } from './CostBreakdownTable.js';
 import { computeSessionStats } from '../utils/computeStats.js';
-import { MODEL_COSTS } from '@google/gemini-cli-core';
+import { calculateCostBreakdown, CostBreakdown } from '@google/gemini-cli-core';
 
 // A more flexible and powerful StatRow component
 interface StatRowProps {
@@ -104,26 +104,38 @@ const ModelUsageTable: React.FC<{
       ></Box>
 
       {/* Rows */}
-      {Object.entries(models).map(([name, modelMetrics]) => (
-        <Box key={name}>
-          <Box width={nameWidth}>
-            <Text>{name.replace('-001', '')}</Text>
+      {Object.entries(models).map(([name, modelMetrics]) => {
+        const outputTokens =
+          (modelMetrics.tokens.total || 0) -
+          (modelMetrics.tokens.prompt || 0) -
+          (modelMetrics.tokens.cached || 0);
+        const fallbackOutputTokens =
+          (modelMetrics.tokens.candidates || 0) +
+          (modelMetrics.tokens.thoughts || 0);
+        const finalOutputTokens =
+          outputTokens > 0 ? outputTokens : fallbackOutputTokens;
+
+        return (
+          <Box key={name}>
+            <Box width={nameWidth}>
+              <Text>{name.replace('-001', '')}</Text>
+            </Box>
+            <Box width={requestsWidth} justifyContent="flex-end">
+              <Text>{modelMetrics.api.totalRequests}</Text>
+            </Box>
+            <Box width={inputTokensWidth} justifyContent="flex-end">
+              <Text color={Colors.AccentYellow}>
+                {modelMetrics.tokens.prompt.toLocaleString()}
+              </Text>
+            </Box>
+            <Box width={outputTokensWidth} justifyContent="flex-end">
+              <Text color={Colors.AccentYellow}>
+                {finalOutputTokens.toLocaleString()}
+              </Text>
+            </Box>
           </Box>
-          <Box width={requestsWidth} justifyContent="flex-end">
-            <Text>{modelMetrics.api.totalRequests}</Text>
-          </Box>
-          <Box width={inputTokensWidth} justifyContent="flex-end">
-            <Text color={Colors.AccentYellow}>
-              {modelMetrics.tokens.prompt.toLocaleString()}
-            </Text>
-          </Box>
-          <Box width={outputTokensWidth} justifyContent="flex-end">
-            <Text color={Colors.AccentYellow}>
-              {modelMetrics.tokens.candidates.toLocaleString()}
-            </Text>
-          </Box>
-        </Box>
-      ))}
+        );
+      })}
       {cacheEfficiency > 0 && (
         <Box flexDirection="column" marginTop={1}>
           <Text>
@@ -192,65 +204,60 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
 
   const modelName = Object.keys(models)[0];
   const metricsForModel = models[modelName];
-  let costBreakdown = null;
-   
-  if (cost !== undefined && metricsForModel) {
-    const promptTokens = metricsForModel.tokens.prompt;
-    const cachedTokens = metricsForModel.tokens.cached;
-    const outputTokens =
-      metricsForModel.tokens.candidates + metricsForModel.tokens.thoughts;
-    const billedInput = promptTokens - cachedTokens;
-   
-    const modelCostInfo = MODEL_COSTS[modelName as keyof typeof MODEL_COSTS];
-   
-    if (modelCostInfo) {
-      let pricing;
-      if (modelName === 'gemini-2.5-pro') {
-        const tiers = modelCostInfo as {
-          small_prompt: any;
-          large_prompt: any;
-        };
-        pricing =
-          promptTokens > 200000 ? tiers.large_prompt : tiers.small_prompt;
-      } else {
-        pricing = modelCostInfo;
-      }
-   
-      const billedInputCost = billedInput * pricing.input;
-      const outputCost = outputTokens * pricing.output;
-      const cachedCost = cachedTokens * pricing.cached;
-   
-      costBreakdown = (
-        <Box flexDirection="column">
-          <CostBreakdownTable
-            billedInput={billedInput}
-            outputTokens={outputTokens}
-            cachedTokens={cachedTokens}
-            billedInputCost={billedInputCost}
-            outputCost={outputCost}
-            cachedCost={cachedCost}
-            totalCost={cost}
-            pricing={pricing}
-          />
-          <Box marginTop={1}>
+  let costBreakdownDisplay = null;
+  let costBreakdown: CostBreakdown | null = null;
+
+  if (metricsForModel) {
+    costBreakdown = calculateCostBreakdown(modelName, {
+      promptTokenCount: metricsForModel.tokens.prompt,
+      cachedContentTokenCount: metricsForModel.tokens.cached,
+      candidatesTokenCount: metricsForModel.tokens.candidates,
+      thinkingTokensCount: metricsForModel.tokens.thoughts,
+      totalTokenCount: metricsForModel.tokens.total,
+    });
+  }
+
+  if (costBreakdown) {
+    const totalCost = cost ?? costBreakdown.totalCost;
+    const breakdownMatchesTotal =
+      Math.abs(totalCost - costBreakdown.totalCost) < 0.0001;
+
+    costBreakdownDisplay = (
+      <Box flexDirection="column">
+        <CostBreakdownTable
+          billedInput={costBreakdown.billedInput}
+          outputTokens={costBreakdown.outputTokens}
+          cachedTokens={costBreakdown.cachedTokens}
+          billedInputCost={costBreakdown.billedInputCost}
+          outputCost={costBreakdown.outputCost}
+          cachedCost={costBreakdown.cachedCost}
+          totalCost={totalCost}
+          pricing={costBreakdown.pricing}
+        />
+        <Box marginTop={1} flexDirection="column">
+          {!breakdownMatchesTotal && (
             <Text color={Colors.Gray}>
-              Cached context storage cost is not included. With{' '}
-              {computed.totalCachedTokens.toLocaleString()} cached tokens and an
-              agent active time of {formatDuration(computed.agentActiveTime)},
-              the estimated maximum storage cost is $
-              {(                          
-                (computed.totalCachedTokens / 1000000) *
-                (computed.agentActiveTime / (1000 * 60 * 60)) *
-                4.5                    
-              ).toFixed(4)}               
-              .                           
-            </Text>                       
-          </Box>                          
-        </Box>                            
-      );                                  
-    }                                     
-  }                                       
-   
+              Note: The cost breakdown is an estimate based on the final pricing
+              tier of the session and may not sum exactly to the total cost if
+              multiple tiers were used.
+            </Text>
+          )}
+          <Text color={Colors.Gray}>
+            Cached context storage cost is not included. With{' '}
+            {computed.totalCachedTokens.toLocaleString()} cached tokens and an
+            agent active time of {formatDuration(computed.agentActiveTime)}, the
+            estimated maximum storage cost is $
+            {(
+              (computed.totalCachedTokens / 1000000) *
+              (computed.agentActiveTime / (1000 * 60 * 60)) *
+              4.5
+            ).toFixed(4)}
+            .
+          </Text>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -321,7 +328,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
         />
       )}
 
-      {costBreakdown}
+      {costBreakdownDisplay}
     </Box>
   );
 };

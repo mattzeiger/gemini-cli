@@ -104,8 +104,6 @@ export function createContentGeneratorConfig(
   return contentGeneratorConfig;
 }
 
-import { CostTrackingContentGenerator } from './costTrackingContentGenerator.js';
-
 export async function createContentGenerator(
   config: ContentGeneratorConfig,
   gcConfig: Config,
@@ -128,11 +126,7 @@ export async function createContentGenerator(
       gcConfig,
       sessionId,
     );
-    return new CostTrackingContentGenerator(
-      generator,
-      config.model,
-      onCostUpdate,
-    );
+    return generator;
   }
 
   if (
@@ -145,11 +139,7 @@ export async function createContentGenerator(
       httpOptions,
     });
 
-    return new CostTrackingContentGenerator(
-      googleGenAI.models,
-      config.model,
-      onCostUpdate,
-    );
+    return googleGenAI.models;
   }
 
   throw new Error(

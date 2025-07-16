@@ -43,8 +43,7 @@ import { setMaxSizedBoxDebugging } from './ui/components/shared/MaxSizedBox.js';
 import { createRequire } from 'node:module';
 import { costState } from './state/costState.js';
 
-const require = createRequire(import.meta.url);
-const pkg = require('../package.json');
+import pkg from '../package.json' with { type: 'json' };
 
 function getNodeMemoryArgs(config: Config): string[] {
   const totalMemoryMB = os.totalmem() / (1024 * 1024);

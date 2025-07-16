@@ -98,12 +98,7 @@ export const AppWrapper = (props: AppProps) => (
   </SessionStatsProvider>
 );
 
-const App = ({
-  config,
-  settings,
-  startupWarnings = [],
-  version,
-}: AppProps) => {
+const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
   useBracketedPaste();
   const [updateMessage, setUpdateMessage] = useState<string | null>(null);
   const { stdout } = useStdout();
