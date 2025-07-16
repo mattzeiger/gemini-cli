@@ -6,6 +6,7 @@
 
 import { GenerateContentResponseUsageMetadata } from '@google/genai';
 
+// For a detailed breakdown of the pricing, see ../../../docs/pricing.md
 export const MODEL_COSTS = {
   'gemini-1.5-pro': {
     input: 7 / 1000000,
