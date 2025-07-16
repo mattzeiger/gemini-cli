@@ -31,55 +31,101 @@ export const MODEL_COSTS = {
   },
 };
 
-export function calculateCost(
+export interface CostBreakdown {
+  billedInput: number;
+  outputTokens: number;
+  cachedTokens: number;
+  billedInputCost: number;
+  outputCost: number;
+  cachedCost: number;
+  totalCost: number;
+  pricing: {
+    input: number;
+    output: number;
+    cached: number;
+  };
+}
+
+export interface TokenCounts {
+  promptTokenCount: number;
+  candidatesTokenCount: number;
+  thinkingTokensCount: number;
+  cachedContentTokenCount: number;
+  totalTokenCount: number;
+}
+
+interface Pricing {
+  input: number;
+  output: number;
+  cached: number;
+}
+
+export function calculateCostBreakdown(
   model: string,
-  usageMetadata: GenerateContentResponseUsageMetadata,
-): number {
+  tokens: TokenCounts,
+): CostBreakdown | null {
   const modelCostInfo = MODEL_COSTS[model as keyof typeof MODEL_COSTS];
   if (!modelCostInfo) {
-    return 0;
+    return null;
   }
 
-  const promptTokens = usageMetadata.promptTokenCount || 0;
-  const candidateTokens = usageMetadata.candidatesTokenCount || 0;
-  const thinkingTokens = usageMetadata.thinkingTokensCount || 0;
-  const cachedTokens = usageMetadata.cachedContentTokenCount || 0;
-  const totalTokens = usageMetadata.totalTokenCount || 0;
+  const promptTokens = tokens.promptTokenCount || 0;
+  const candidateTokens = tokens.candidatesTokenCount || 0;
+  const thinkingTokens = tokens.thinkingTokensCount || 0;
+  const cachedTokens = tokens.cachedContentTokenCount || 0;
+  const totalTokens = tokens.totalTokenCount || 0;
 
-  let modelCosts;
+  let pricing: Pricing;
   if (model === 'gemini-2.5-pro') {
     const tiers = modelCostInfo as {
-      small_prompt: { input: number; output: number; cached: number };
-      large_prompt: { input: number; output: number; cached: number };
+      small_prompt: Pricing;
+      large_prompt: Pricing;
     };
-    modelCosts =
-      promptTokens > 200000 ? tiers.large_prompt : tiers.small_prompt;
+    pricing = promptTokens > 200000 ? tiers.large_prompt : tiers.small_prompt;
   } else {
-    modelCosts = modelCostInfo as {
-      input: number;
-      output: number;
-      cached: number;
-    };
-  }
-
-  if (!modelCosts) {
-    return 0;
+    pricing = modelCostInfo as Pricing;
   }
 
   // The most reliable way to calculate output tokens is to take the total
   // and subtract the known input-side tokens.
-  const outputTokens = totalTokens - promptTokens - cachedTokens;
+  const calculatedOutputTokens = totalTokens - promptTokens - cachedTokens;
 
   // As a fallback, if for some reason totalTokenCount is not provided,
   // sum up the known output-side tokens.
   const fallbackOutputTokens = candidateTokens + thinkingTokens;
 
-  const finalOutputTokens =
-    outputTokens > 0 ? outputTokens : fallbackOutputTokens;
+  const outputTokens =
+    calculatedOutputTokens > 0 ? calculatedOutputTokens : fallbackOutputTokens;
 
-  const inputCost = (promptTokens - cachedTokens) * modelCosts.input;
-  const outputCost = finalOutputTokens * modelCosts.output;
-  const cachedCost = cachedTokens * modelCosts.cached;
+  const billedInput = promptTokens - cachedTokens;
+  const billedInputCost = billedInput * pricing.input;
+  const outputCost = outputTokens * pricing.output;
+  const cachedCost = cachedTokens * pricing.cached;
+  const totalCost = billedInputCost + outputCost + cachedCost;
 
-  return inputCost + outputCost + cachedCost;
+  return {
+    billedInput,
+    outputTokens,
+    cachedTokens,
+    billedInputCost,
+    outputCost,
+    cachedCost,
+    totalCost,
+    pricing,
+  };
+}
+
+export function calculateCost(
+  model: string,
+  usageMetadata: GenerateContentResponseUsageMetadata,
+): number {
+  const breakdown = calculateCostBreakdown(model, {
+    promptTokenCount: usageMetadata.promptTokenCount || 0,
+    candidatesTokenCount: usageMetadata.candidatesTokenCount || 0,
+    thinkingTokensCount: usageMetadata.thinkingTokensCount || 0,
+    cachedContentTokenCount: usageMetadata.cachedContentTokenCount || 0,
+    totalTokenCount: usageMetadata.totalTokenCount || 0,
+  });
+
+  return breakdown?.totalCost || 0;
 }

@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+<<<<<<< HEAD
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import {
+  ContentGenerator,
   createContentGenerator,
   AuthType,
   createContentGeneratorConfig,
@@ -21,20 +23,20 @@ const mockConfig = {} as unknown as Config;
 
 describe('createContentGenerator', () => {
   it('should create a CodeAssistContentGenerator', async () => {
-    const mockGenerator = {} as unknown;
+    const mockGenerator = {} as ContentGenerator;
     vi.mocked(createCodeAssistContentGenerator).mockResolvedValue(
       mockGenerator as never,
     );
-    const generator = (await createContentGenerator(
+    const generator = await createContentGenerator(
       {
         model: 'test-model',
         authType: AuthType.LOGIN_WITH_GOOGLE,
       },
       mockConfig,
       () => {},
-    )) as any;
+    );
     expect(createCodeAssistContentGenerator).toHaveBeenCalled();
-    expect(generator.wrapped).toBe(mockGenerator);
+    expect(generator).toBe(mockGenerator);
   });
 
   it('should create a GoogleGenAI content generator', async () => {
@@ -42,7 +44,7 @@ describe('createContentGenerator', () => {
       models: {},
     } as unknown;
     vi.mocked(GoogleGenAI).mockImplementation(() => mockGenerator as never);
-    const generator = (await createContentGenerator(
+    const generator = await createContentGenerator(
       {
         model: 'test-model',
         apiKey: 'test-api-key',
@@ -50,7 +52,7 @@ describe('createContentGenerator', () => {
       },
       mockConfig,
       () => {},
-    )) as any;
+    );
     expect(GoogleGenAI).toHaveBeenCalledWith({
       apiKey: 'test-api-key',
       vertexai: undefined,
@@ -60,7 +62,7 @@ describe('createContentGenerator', () => {
         },
       },
     });
-    expect(generator.wrapped).toBe((mockGenerator as GoogleGenAI).models);
+    expect(generator).toBe((mockGenerator as GoogleGenAI).models);
   });
 });
 
