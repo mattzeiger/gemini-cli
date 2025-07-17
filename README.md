@@ -16,6 +16,7 @@ With the Gemini CLI you can:
   Veo or Lyria](https://github.com/GoogleCloudPlatform/vertex-ai-creative-studio/tree/main/experiments/mcp-genmedia)
 - Ground your queries with the [Google Search](https://ai.google.dev/gemini-api/docs/grounding)
   tool, built in to Gemini.
+- Track your API usage costs for the current session.
 
 ## Quickstart
 
@@ -152,6 +153,15 @@ Use MCP servers to integrate your local system tools with your enterprise collab
 ```text
 > Organize my PDF invoices by month of expenditure.
 ```
+
+### Cost Tracking
+
+The Gemini CLI helps you keep track of your API usage costs. The footer of the
+CLI displays the estimated total cost of your current session. This allows you
+to monitor your spending and use the tool responsibly.
+
+The cost is calculated based on the model you are using and the number of
+tokens in your prompts and responses.
 
 ### Uninstall
 
