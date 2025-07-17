@@ -402,6 +402,8 @@ describe('useGeminiStream', () => {
           () => 'vscode' as EditorType,
           () => {},
           () => Promise.resolve(),
+          false,
+          () => {},
         );
       },
       {
@@ -1093,18 +1095,7 @@ describe('useGeminiStream', () => {
           false,
           () => 'vscode' as EditorType,
           () => {},
-<<<<<<< HEAD
-<<<<<<< HEAD
           mockPerformMemoryRefresh,
-          false,
-          () => {},
-        ),
-=======
-          mockPerformMemoryRefresh,          
->>>>>>> 5e6c50c9 (feat: Add cost tracking for Gemini API usage)
-=======
-          mockPerformMemoryRefresh,
->>>>>>> da2284e1 (updates for cost tracking)
         ),
       );
 
@@ -1155,11 +1146,6 @@ describe('useGeminiStream', () => {
           () => 'vscode' as EditorType,
           () => {},
           () => Promise.resolve(),
-<<<<<<< HEAD
-          false,
-          () => {},
-=======
->>>>>>> da2284e1 (updates for cost tracking)
         ),
       );
 

@@ -47,6 +47,7 @@ describe('quitCommand', () => {
         {
           type: 'quit',
           duration: '1h 0m 0s',
+          cost: 0,
           id: expect.any(Number),
         },
       ],

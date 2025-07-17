@@ -15,6 +15,7 @@ import {
 } from '@google/genai';
 import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
+import { getEffectiveModel } from './modelCheck.js';
 import { Config } from '../config/config.js';
 import { UserTierId } from '../code_assist/types.js';
 import { CostBreakdown } from './costUtils.js';

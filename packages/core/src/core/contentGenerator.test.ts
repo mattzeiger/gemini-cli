@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-<<<<<<< HEAD
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import {
   ContentGenerator,

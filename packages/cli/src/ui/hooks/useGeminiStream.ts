@@ -91,6 +91,8 @@ export const useGeminiStream = (
   getPreferredEditor: () => EditorType | undefined,
   onAuthError: () => void,
   performMemoryRefresh: () => Promise<void>,
+  modelSwitchedFromQuotaError: boolean,
+  setModelSwitchedFromQuotaError: (value: boolean) => void,
 ) => {
   const [initError, setInitError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);

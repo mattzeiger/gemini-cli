@@ -41,10 +41,10 @@ import {
 } from '@google/gemini-cli-core';
 import { validateAuthMethod } from './config/auth.js';
 import { setMaxSizedBoxDebugging } from './ui/components/shared/MaxSizedBox.js';
-import { createRequire } from 'node:module';
+// import { createRequire } from 'node:module';
 import { costState } from './state/costState.js';
 
-import pkg from '../package.json' with { type: 'json' };
+// const pkg = require('../package.json');
 
 function getNodeMemoryArgs(config: Config): string[] {
   const totalMemoryMB = os.totalmem() / (1024 * 1024);

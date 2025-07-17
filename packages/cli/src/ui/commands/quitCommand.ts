@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { costState } from '../../state/costState.js';
 import { formatDuration } from '../utils/formatters.js';
 import { type SlashCommand } from './types.js';
 
@@ -27,6 +28,7 @@ export const quitCommand: SlashCommand = {
         {
           type: 'quit',
           duration: formatDuration(wallDuration),
+          cost: costState.getTotalCost(),
           id: now,
         },
       ],

@@ -156,7 +156,7 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
   const [constrainHeight, setConstrainHeight] = useState<boolean>(true);
   const [showPrivacyNotice, setShowPrivacyNotice] = useState<boolean>(false);
   const [modelSwitchedFromQuotaError, setModelSwitchedFromQuotaError] =
-    useState<boolean>(false);
+    useState(false);
   const [userTier, setUserTier] = useState<UserTierId | undefined>(undefined);
 
   const openPrivacyNotice = useCallback(() => {
@@ -457,14 +457,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
         if (timerRef.current) {
           clearTimeout(timerRef.current);
         }
-        const quitCommand = slashCommands.find(
-          (cmd) => cmd.name === 'quit' || cmd.altName === 'exit',
-        );
-        if (quitCommand) {
-          quitCommand.action('quit', '', '');
-        } else {
-          process.exit(0);
-        }
+        // Directly invoke the central command handler.
+        handleSlashCommand('/quit');
       } else {
         setPressedOnce(true);
         timerRef.current = setTimeout(() => {
@@ -549,6 +543,8 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
     getPreferredEditor,
     onAuthError,
     performMemoryRefresh,
+    modelSwitchedFromQuotaError,
+    setModelSwitchedFromQuotaError,
   );
   pendingHistoryItems.push(...pendingGeminiHistoryItems);
   const { elapsedTime, currentLoadingPhrase } =

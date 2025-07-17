@@ -353,7 +353,6 @@ describe('useSlashCommandProcessor', () => {
         mockConfig,
         mockLoader,
       );
-<<<<<<< HEAD
       vi.mocked(CommandService).mockImplementation(
         () => commandServiceInstance,
       );
