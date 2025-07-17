@@ -45,6 +45,7 @@ import {
   DEFAULT_GEMINI_FLASH_MODEL,
 } from './models.js';
 import { ClearcutLogger } from '../telemetry/clearcut-logger/clearcut-logger.js';
+import { CostBreakdown } from '../core/costUtils.js';
 
 export enum ApprovalMode {
   DEFAULT = 'default',
@@ -144,13 +145,14 @@ export interface ConfigParameters {
   bugCommand?: BugCommandSettings;
   model: string;
   extensionContextFilePaths?: string[];
+<<<<<<< HEAD
   maxSessionTurns?: number;
   listExtensions?: boolean;
   activeExtensions?: ActiveExtension[];
   noBrowser?: boolean;
   summarizeToolOutput?: Record<string, SummarizeToolOutputSettings>;
   ideMode?: boolean;
-  onCostUpdate?: (cost: number) => void;
+  onCostUpdate?: (breakdown: CostBreakdown) => void;
 }
 
 export class Config {
@@ -192,10 +194,11 @@ export class Config {
   private readonly noBrowser: boolean;
   private readonly ideMode: boolean;
   private modelSwitchedDuringSession: boolean = false;
+<<<<<<< HEAD
   private readonly maxSessionTurns: number;
   private readonly listExtensions: boolean;
   private readonly _activeExtensions: ActiveExtension[];
-  private readonly onCostUpdate: (cost: number) => void;
+  private readonly onCostUpdate: (breakdown: CostBreakdown) => void;
   flashFallbackHandler?: FlashFallbackHandler;
   private quotaErrorOccurred: boolean = false;
   private readonly summarizeToolOutput:

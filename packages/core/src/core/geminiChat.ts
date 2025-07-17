@@ -35,7 +35,7 @@ import {
   ApiResponseEvent,
 } from '../telemetry/types.js';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
-import { calculateCostBreakdown } from './costUtils.js';
+import { CostBreakdown, calculateCostBreakdown } from './costUtils.js';
 
 /**
  * Returns true if the response is valid, false otherwise.
@@ -135,7 +135,7 @@ export class GeminiChat {
   constructor(
     private readonly config: Config,
     private readonly contentGenerator: ContentGenerator,
-    private readonly onCostUpdate: (cost: number) => void,
+    private readonly onCostUpdate: (breakdown: CostBreakdown) => void,
     private readonly generationConfig: GenerateContentConfig = {},
     private history: Content[] = [],
   ) {
@@ -333,8 +333,8 @@ export class GeminiChat {
           totalTokenCount: response.usageMetadata.totalTokenCount || 0,
         });
 
-        if (costBreakdown && costBreakdown.totalCost > 0) {
-          this.onCostUpdate(costBreakdown.totalCost);
+        if (costBreakdown) {
+          this.onCostUpdate(costBreakdown);
         }
       }
 
@@ -584,8 +584,8 @@ export class GeminiChat {
           totalTokenCount: finalUsage.totalTokenCount || 0,
         });
 
-        if (costBreakdown && costBreakdown.totalCost > 0) {
-          this.onCostUpdate(costBreakdown.totalCost);
+        if (costBreakdown) {
+          this.onCostUpdate(costBreakdown);
         }
       }
     }

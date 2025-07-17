@@ -20,20 +20,5 @@ exports[`<SessionSummaryDisplay /> > renders the summary display with a title 1`
 │                                                                                                  │
 │  » Tip: For a full token breakdown, run \`/stats model\`.                                          │
 │                                                                                                  │
-│  Tokens         Type                Rate           Cost                                          │
-│  ──────────────────────────────────────────────────                                              │
-│  500            Billed Input        1.25/M         $0.0006                                       │
-│  2,000          Output              10.00/M        $0.0200                                       │
-│  500            Cached Tokens       0.31/M         $0.0002                                       │
-│                                                                                                  │
-│  ──────────────────────────────────────────────────                                              │
-│                                                                                                  │
-│  Total Estimated Cost:              $0.0000                                                      │
-│                                                                                                  │
-│  Note: The cost breakdown is an estimate based on the final pricing tier of the session and may  │
-│   not sum exactly to the total cost if multiple tiers were used.                                 │
-│  Cached context storage cost is not included. With 500 cached tokens and an agent active time    │
-│  of 50.2s, the estimated maximum storage cost is $0.0000.                                        │
-│                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
 `;

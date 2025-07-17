@@ -73,18 +73,6 @@ exports[`<StatsDisplay /> > Conditional Rendering Tests > hides Efficiency secti
 │  ───────────────────────────────────────────────────────────────                                 │
 │  gemini-2.5-pro                  1            100            100                                 │
 │                                                                                                  │
-│  Tokens         Type                Rate           Cost                                          │
-│  ──────────────────────────────────────────────────                                              │
-│  100            Billed Input        1.25/M         $0.0001                                       │
-│  100            Output              10.00/M        $0.0010                                       │
-│                                                                                                  │
-│  ──────────────────────────────────────────────────                                              │
-│                                                                                                  │
-│  Total Estimated Cost:              $0.0011                                                      │
-│                                                                                                  │
-│  Cached context storage cost is not included. With 0 cached tokens and an agent active time of   │
-│  100ms, the estimated maximum storage cost is $0.0000.                                           │
-│                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
 `;
 
@@ -158,19 +146,6 @@ exports[`<StatsDisplay /> > renders a table with two models correctly 1`] = `
 │                                                                                                  │
 │  » Tip: For a full token breakdown, run \`/stats model\`.                                          │
 │                                                                                                  │
-│  Tokens         Type                Rate           Cost                                          │
-│  ──────────────────────────────────────────────────                                              │
-│  500            Billed Input        1.25/M         $0.0006                                       │
-│  41,734         Output              10.00/M        $0.4173                                       │
-│  500            Cached Tokens       0.31/M         $0.0002                                       │
-│                                                                                                  │
-│  ──────────────────────────────────────────────────                                              │
-│                                                                                                  │
-│  Total Estimated Cost:              $0.4181                                                      │
-│                                                                                                  │
-│  Cached context storage cost is not included. With 10,500 cached tokens and an agent active      │
-│  time of 19.5s, the estimated maximum storage cost is $0.0003.                                   │
-│                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
 `;
 
@@ -198,19 +173,6 @@ exports[`<StatsDisplay /> > renders all sections when all data is present 1`] = 
 │  Savings Highlight: 50 (50.0%) of input tokens were served from the cache, reducing costs.       │
 │                                                                                                  │
 │  » Tip: For a full token breakdown, run \`/stats model\`.                                          │
-│                                                                                                  │
-│  Tokens         Type                Rate           Cost                                          │
-│  ──────────────────────────────────────────────────                                              │
-│  50             Billed Input        1.25/M         $0.0001                                       │
-│  100            Output              10.00/M        $0.0010                                       │
-│  50             Cached Tokens       0.31/M         $0.0000                                       │
-│                                                                                                  │
-│  ──────────────────────────────────────────────────                                              │
-│                                                                                                  │
-│  Total Estimated Cost:              $0.0011                                                      │
-│                                                                                                  │
-│  Cached context storage cost is not included. With 50 cached tokens and an agent active time of  │
-│   223ms, the estimated maximum storage cost is $0.0000.                                          │
 │                                                                                                  │
 ╰──────────────────────────────────────────────────────────────────────────────────────────────────╯"
 `;

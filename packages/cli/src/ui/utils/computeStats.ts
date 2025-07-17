@@ -10,6 +10,26 @@ import {
   ModelMetrics,
 } from '../contexts/SessionContext.js';
 
+export interface TieredCostSummary {
+  tier1: {
+    billedInput: number;
+    outputTokens: number;
+    cachedTokens: number;
+    billedInputCost: number;
+    outputCost: number;
+    cachedCost: number;
+  };
+  tier2: {
+    billedInput: number;
+    outputTokens: number;
+    cachedTokens: number;
+    billedInputCost: number;
+    outputCost: number;
+    cachedCost: number;
+  };
+  totalCost: number;
+}
+
 export function calculateErrorRate(metrics: ModelMetrics): number {
   if (metrics.api.totalRequests === 0) {
     return 0;
