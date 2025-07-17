@@ -59,6 +59,7 @@ import {
   FlashFallbackEvent,
   logFlashFallback,
   AuthType,
+  CostBreakdown,
 } from '@google/gemini-cli-core';
 import { validateAuthMethod } from '../config/auth.js';
 import { useLogger } from './hooks/useLogger.js';
@@ -171,8 +172,12 @@ const App = ({ config, settings, startupWarnings = [], version }: AppProps) => {
   const [totalCost, setTotalCost] = useState(costState.getTotalCost());
 
   useEffect(() => {
-    const handleCostChange = (newCost: number) => {
-      setTotalCost(newCost);
+    const handleCostChange = (breakdowns: CostBreakdown[]) => {
+      const newTotal = breakdowns.reduce(
+        (acc, breakdown) => acc + breakdown.totalCost,
+        0,
+      );
+      setTotalCost(newTotal);
     };
     costState.on('change', handleCostChange);
     return () => {

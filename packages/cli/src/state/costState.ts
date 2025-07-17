@@ -5,23 +5,30 @@
  */
 
 import { EventEmitter } from 'events';
+import { CostBreakdown } from '@google/gemini-cli-core';
 
 class CostState extends EventEmitter {
-  private totalCost = 0;
+  private costBreakdowns: CostBreakdown[] = [];
 
   constructor() {
     super();
-    const initialCost = Number(process.env.GEMINI_CLI_SESSION_COST || 0);
-    this.totalCost = initialCost;
+    // TODO: Restore session cost from environment variables if needed.
   }
 
-  getTotalCost() {
-    return this.totalCost;
+  getCostBreakdowns() {
+    return this.costBreakdowns;
   }
 
-  updateCost(cost: number) {
-    this.totalCost += cost;
-    this.emit('change', this.totalCost);
+  getTotalCost(): number {
+    return this.costBreakdowns.reduce(
+      (acc, breakdown) => acc + breakdown.totalCost,
+      0,
+    );
+  }
+
+  addCostBreakdown(breakdown: CostBreakdown) {
+    this.costBreakdowns.push(breakdown);
+    this.emit('change', this.costBreakdowns);
   }
 }
 

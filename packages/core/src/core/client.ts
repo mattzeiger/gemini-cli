@@ -42,6 +42,7 @@ import { ProxyAgent, setGlobalDispatcher } from 'undici';
 import { DEFAULT_GEMINI_FLASH_MODEL } from '../config/models.js';
 import { LoopDetectionService } from '../services/loopDetectionService.js';
 import { ideContext } from '../services/ideContext.js';
+import { CostBreakdown } from './costUtils.js';
 
 function isThinkingSupported(model: string) {
   if (model.startsWith('gemini-2.5')) return true;
@@ -105,7 +106,7 @@ export class GeminiClient {
   private readonly loopDetector: LoopDetectionService;
   private lastPromptId?: string;
 
-  private onCostUpdate: (cost: number) => void = () => {};
+  private onCostUpdate: (breakdown: CostBreakdown) => void = () => {};
 
   constructor(private config: Config) {
     if (config.getProxy()) {
@@ -118,7 +119,7 @@ export class GeminiClient {
 
   async initialize(
     contentGeneratorConfig: ContentGeneratorConfig,
-    onCostUpdate: (cost: number) => void,
+    onCostUpdate: (breakdown: CostBreakdown) => void,
   ) {
     this.onCostUpdate = onCostUpdate;
     this.contentGenerator = await createContentGenerator(

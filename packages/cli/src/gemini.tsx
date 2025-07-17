@@ -37,6 +37,7 @@ import {
   logUserPrompt,
   AuthType,
   getOauthClient,
+  CostBreakdown,
 } from '@google/gemini-cli-core';
 import { validateAuthMethod } from './config/auth.js';
 import { setMaxSizedBoxDebugging } from './ui/components/shared/MaxSizedBox.js';
@@ -117,7 +118,7 @@ export async function main() {
     extensions,
     sessionId,
     argv,
-    (cost: number) => costState.updateCost(cost),
+    (breakdown: CostBreakdown) => costState.addCostBreakdown(breakdown),
   );
 
   if (argv.promptInteractive && !process.stdin.isTTY) {
@@ -341,7 +342,7 @@ async function loadNonInteractiveConfig(
       extensions,
       config.getSessionId(),
       argv,
-      () => {}, // onCostUpdate
+      (_breakdown: CostBreakdown) => {}, // onCostUpdate
     );
     await finalConfig.initialize();
   }

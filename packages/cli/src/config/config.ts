@@ -19,6 +19,7 @@ import {
   TelemetryTarget,
   MCPServerConfig,
   IDE_SERVER_NAME,
+  CostBreakdown,
 } from '@google/gemini-cli-core';
 import { Settings } from './settings.js';
 
@@ -235,7 +236,7 @@ export async function loadCliConfig(
   extensions: Extension[],
   sessionId: string,
   argv: CliArgs,
-  onCostUpdate: (cost: number) => void,
+  onCostUpdate: (breakdown: CostBreakdown) => void,
 ): Promise<Config> {
   const debugMode =
     argv.debug ||

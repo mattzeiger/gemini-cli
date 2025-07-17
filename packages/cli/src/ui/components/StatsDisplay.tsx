@@ -18,8 +18,12 @@ import {
   USER_AGREEMENT_RATE_MEDIUM,
 } from '../utils/displayUtils.js';
 import { CostBreakdownTable } from './CostBreakdownTable.js';
-import { computeSessionStats } from '../utils/computeStats.js';
-import { calculateCostBreakdown, CostBreakdown } from '@google/gemini-cli-core';
+import { costState } from '../../state/costState.js';
+import {
+  computeSessionStats,
+  TieredCostSummary,
+} from '../utils/computeStats.js';
+import { MODEL_COSTS } from '@google/gemini-cli-core';
 
 // A more flexible and powerful StatRow component
 interface StatRowProps {
@@ -162,12 +166,12 @@ interface StatsDisplayProps {
 export const StatsDisplay: React.FC<StatsDisplayProps> = ({
   duration,
   title,
-  cost,
 }) => {
   const { stats } = useSessionStats();
   const { metrics } = stats;
   const { models, tools } = metrics;
   const computed = computeSessionStats(metrics);
+  const costBreakdowns = costState.getCostBreakdowns();
 
   const successThresholds = {
     green: TOOL_SUCCESS_RATE_HIGH,
@@ -202,46 +206,47 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
     );
   };
 
-  const modelName = Object.keys(models)[0];
-  const metricsForModel = models[modelName];
   let costBreakdownDisplay = null;
-  let costBreakdown: CostBreakdown | null = null;
+  if (costBreakdowns.length > 0) {
+    const tieredSummary: TieredCostSummary = {
+      tier1: {
+        billedInput: 0,
+        outputTokens: 0,
+        cachedTokens: 0,
+        billedInputCost: 0,
+        outputCost: 0,
+        cachedCost: 0,
+      },
+      tier2: {
+        billedInput: 0,
+        outputTokens: 0,
+        cachedTokens: 0,
+        billedInputCost: 0,
+        outputCost: 0,
+        cachedCost: 0,
+      },
+      totalCost: 0,
+    };
 
-  if (metricsForModel) {
-    costBreakdown = calculateCostBreakdown(modelName, {
-      promptTokenCount: metricsForModel.tokens.prompt,
-      cachedContentTokenCount: metricsForModel.tokens.cached,
-      candidatesTokenCount: metricsForModel.tokens.candidates,
-      thinkingTokensCount: metricsForModel.tokens.thoughts,
-      totalTokenCount: metricsForModel.tokens.total,
-    });
-  }
-
-  if (costBreakdown) {
-    const totalCost = cost ?? costBreakdown.totalCost;
-    const breakdownMatchesTotal =
-      Math.abs(totalCost - costBreakdown.totalCost) < 0.0001;
+    for (const breakdown of costBreakdowns) {
+      const tier =
+        breakdown.pricing.input >
+        MODEL_COSTS['gemini-2.5-pro'].small_prompt.input
+          ? 'tier2'
+          : 'tier1';
+      tieredSummary[tier].billedInput += breakdown.billedInput;
+      tieredSummary[tier].outputTokens += breakdown.outputTokens;
+      tieredSummary[tier].cachedTokens += breakdown.cachedTokens;
+      tieredSummary[tier].billedInputCost += breakdown.billedInputCost;
+      tieredSummary[tier].outputCost += breakdown.outputCost;
+      tieredSummary[tier].cachedCost += breakdown.cachedCost;
+      tieredSummary.totalCost += breakdown.totalCost;
+    }
 
     costBreakdownDisplay = (
       <Box flexDirection="column">
-        <CostBreakdownTable
-          billedInput={costBreakdown.billedInput}
-          outputTokens={costBreakdown.outputTokens}
-          cachedTokens={costBreakdown.cachedTokens}
-          billedInputCost={costBreakdown.billedInputCost}
-          outputCost={costBreakdown.outputCost}
-          cachedCost={costBreakdown.cachedCost}
-          totalCost={totalCost}
-          pricing={costBreakdown.pricing}
-        />
+        <CostBreakdownTable tieredSummary={tieredSummary} />
         <Box marginTop={1} flexDirection="column">
-          {!breakdownMatchesTotal && (
-            <Text color={Colors.Gray}>
-              Note: The cost breakdown is an estimate based on the final pricing
-              tier of the session and may not sum exactly to the total cost if
-              multiple tiers were used.
-            </Text>
-          )}
           <Text color={Colors.Gray}>
             Cached context storage cost is not included. With{' '}
             {computed.totalCachedTokens.toLocaleString()} cached tokens and an
