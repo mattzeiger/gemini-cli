@@ -145,7 +145,6 @@ export interface ConfigParameters {
   bugCommand?: BugCommandSettings;
   model: string;
   extensionContextFilePaths?: string[];
-<<<<<<< HEAD
   maxSessionTurns?: number;
   listExtensions?: boolean;
   activeExtensions?: ActiveExtension[];
@@ -194,7 +193,6 @@ export class Config {
   private readonly noBrowser: boolean;
   private readonly ideMode: boolean;
   private modelSwitchedDuringSession: boolean = false;
-<<<<<<< HEAD
   private readonly maxSessionTurns: number;
   private readonly listExtensions: boolean;
   private readonly _activeExtensions: ActiveExtension[];
